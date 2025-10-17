@@ -14,10 +14,18 @@ pip install -e .
 
 ## Usage
 
-Edit `swap_metadata.py` with your GitHub credentials and repository URLs, then run:
+Edit `swap_metadata.py` with your GitHub credentials and repository paths, then run:
 
 ```bash
 python swap_metadata.py
+```
+
+Example configuration:
+```python
+username = "your_username"
+token = "your_personal_access_token"
+repo1_path = "owner/repository1"  # Format: owner/repo
+repo2_path = "owner/repository2"  # Format: owner/repo
 ```
 
 ## Python 3.10+ Features

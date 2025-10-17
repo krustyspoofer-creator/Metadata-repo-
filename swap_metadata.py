@@ -5,8 +5,8 @@ import requests
 def swap_repository_descriptions(
     username: str,
     token: str,
-    repo1_url: str,
-    repo2_url: str
+    repo1_path: str,
+    repo2_path: str
 ) -> dict[str, str | None]:
     """
     Swap descriptions between two GitHub repositories.
@@ -14,44 +14,52 @@ def swap_repository_descriptions(
     Args:
         username: GitHub username for authentication
         token: GitHub personal access token
-        repo1_url: First repository URL
-        repo2_url: Second repository URL
+        repo1_path: First repository path (format: 'owner/repo')
+        repo2_path: Second repository path (format: 'owner/repo')
         
     Returns:
         Dictionary with status of the swap operation
     """
-    # Retrieve build information for each repository
-    repo1_info = requests.get(
-        f"https://api.github.com/repos/{repo1_url}",
+    # Retrieve repository information for each repository
+    response1 = requests.get(
+        f"https://api.github.com/repos/{repo1_path}",
         auth=(username, token)
-    ).json()
-    repo2_info = requests.get(
-        f"https://api.github.com/repos/{repo2_url}",
-        auth=(username, token)
-    ).json()
-    
-    # Swap build information
-    repo1_description = repo1_info["description"]
-    repo2_description = repo2_info["description"]
-    
-    repo1_info["description"] = repo2_description
-    repo2_info["description"] = repo1_description
-    
-    # Update build information for each repository
-    response1 = requests.patch(
-        f"https://api.github.com/repos/{repo1_url}",
-        auth=(username, token),
-        json=repo1_info
     )
-    response2 = requests.patch(
-        f"https://api.github.com/repos/{repo2_url}",
+    response2 = requests.get(
+        f"https://api.github.com/repos/{repo2_path}",
+        auth=(username, token)
+    )
+    
+    # Check for errors in retrieving repository information
+    if response1.status_code != 200 or response2.status_code != 200:
+        return {
+            "repo1_status": "failed" if response1.status_code != 200 else "success",
+            "repo2_status": "failed" if response2.status_code != 200 else "success",
+            "error": "Failed to retrieve repository information",
+        }
+    
+    repo1_info = response1.json()
+    repo2_info = response2.json()
+    
+    # Swap repository descriptions
+    repo1_description = repo1_info.get("description")
+    repo2_description = repo2_info.get("description")
+    
+    # Update repository information for each repository
+    update1 = requests.patch(
+        f"https://api.github.com/repos/{repo1_path}",
         auth=(username, token),
-        json=repo2_info
+        json={"description": repo2_description}
+    )
+    update2 = requests.patch(
+        f"https://api.github.com/repos/{repo2_path}",
+        auth=(username, token),
+        json={"description": repo1_description}
     )
     
     return {
-        "repo1_status": "success" if response1.status_code == 200 else "failed",
-        "repo2_status": "success" if response2.status_code == 200 else "failed",
+        "repo1_status": "success" if update1.status_code == 200 else "failed",
+        "repo2_status": "success" if update2.status_code == 200 else "failed",
         "repo1_new_description": repo2_description,
         "repo2_new_description": repo1_description,
     }
@@ -62,9 +70,9 @@ if __name__ == "__main__":
     username = "your_username"
     token = "your_token"
     
-    # Repository URLs
-    repo1_url = "https://github.com/user/repo1.git"
-    repo2_url = "https://github.com/user/repo2.git"
+    # Repository paths (format: owner/repo)
+    repo1_path = "user/repo1"
+    repo2_path = "user/repo2"
     
-    result = swap_repository_descriptions(username, token, repo1_url, repo2_url)
+    result = swap_repository_descriptions(username, token, repo1_path, repo2_path)
     print(f"Swap completed: {result}")
