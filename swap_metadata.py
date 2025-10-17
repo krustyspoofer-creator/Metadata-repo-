@@ -35,7 +35,7 @@ def swap_repository_descriptions(
         return {
             "repo1_status": "failed" if response1.status_code != 200 else "success",
             "repo2_status": "failed" if response2.status_code != 200 else "success",
-            "error": "Failed to retrieve repository information",
+            "error": f"Failed to retrieve repository information. Status codes: {response1.status_code}, {response2.status_code}",
         }
     
     repo1_info = response1.json()
