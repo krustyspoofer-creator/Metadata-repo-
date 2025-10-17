@@ -1,22 +1,35 @@
 # Metadata-repo-
-import requests
 
-# GitHub API credentials
+Script to swap repository descriptions using GitHub API.
+
+## Requirements
+
+- Python 3.10 or higher
+
+## Installation
+
+```bash
+pip install -e .
+```
+
+## Usage
+
+Edit `swap_metadata.py` with your GitHub credentials and repository paths, then run:
+
+```bash
+python swap_metadata.py
+```
+
+Example configuration:
+```python
 username = "your_username"
-token = "your_token"
+token = "your_personal_access_token"
+repo1_path = "owner/repository1"  # Format: owner/repo
+repo2_path = "owner/repository2"  # Format: owner/repo
+```
 
-# Repository URLs
-repo1_url = "https://github.com/user/repo1.git"
-repo2_url = "https://github.com/user/repo2.git"
+## Python 3.10+ Features
 
-# Retrieve build information for each repository
-repo1_info = requests.get(f"https://api.github.com/repos/{repo1_url}", auth=(username, token)).json()
-repo2_info = requests.get(f"https://api.github.com/repos/{repo2_url}", auth=(username, token)).json()
-
-# Swap build information
-repo1_info["description"] = repo2_info["description"]
-repo2_info["description"] = repo1_info["description"]
-
-# Update build information for each repository
-requests.patch(f"https://api.github.com/repos/{repo1_url}", auth=(username, token), json=repo1_info)
-requests.patch(f"https://api.github.com/repos/{repo2_url}", auth=(username, token), json=repo2_info)
+This project uses Python 3.10+ syntax features including:
+- PEP 604: Union type operator `|` for type hints (e.g., `str | None` instead of `Optional[str]`)
+- PEP 585: Built-in generic types (e.g., `dict[str, str]` instead of `Dict[str, str]`)
