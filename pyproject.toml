@@ -1,0 +1,12 @@
+[project]
+name = "metadata-repo"
+version = "0.1.0"
+description = "Script to swap repository descriptions using GitHub API"
+requires-python = ">=3.10"
+dependencies = [
+    "requests>=2.31.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
